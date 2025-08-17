@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/dashboard_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/login_screen.dart';
+import 'package:tugas_13_laporan_keuangan_harian/screens/register_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/splash_screen.dart';
 
 void main() {
@@ -23,8 +24,9 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => SplashScreen(),
-        '/login': (context) => LoginScreen(),
-        '/dashboard_screen': (context) => DashboardScreen(),
+        LoginScreen.id: (context) => LoginScreen(),
+        DashboardScreen.id: (context) => DashboardScreen(),
+        RegisterScreen.id: (context) => RegisterScreen(),
       },
     );
   }

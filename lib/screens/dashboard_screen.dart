@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:tugas_13_laporan_keuangan_harian/screens/login_screen.dart';
+import 'package:tugas_13_laporan_keuangan_harian/screens/user_screen.dart';
+// import 'package:tugas_13_laporan_keuangan_harian/utils/auth_service.dart';
 import 'package:tugas_13_laporan_keuangan_harian/widgets/button_action.dart';
+// import 'package:tugas_13_laporan_keuangan_harian/widgets/logout_button.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -44,8 +48,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ListTile(
               leading: Icon(Icons.account_box),
               title: Text('Manajemen Akun'),
-              onTap: () async {},
-              // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ReportScreen())),
+              // onTap: () => _onDrawerTapped(0),
+              // onTap: () async {},
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserScreen()),
+              ),
             ),
             ListTile(
               leading: Icon(Icons.add),
@@ -69,10 +77,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ListTile(
               leading: Icon(Icons.exit_to_app),
               title: Text('Keluar Sesi'),
-              onTap: () async {
-                // await Provider.of<AuthService>(context).logout();
-                // Navigator.pushReplacementNamed(context, '/LoginScreen');
+              onTap: () {
+                // Tampilkan dialog konfirmasi
+                _showLogoutConfirmation(context);
               },
+
+              // onTap: () => _onDrawerTapped(1),
+              // onTap: () async {},
+              // await Provider.of<AuthService>(context).logout();
+              // Navigator.pushReplacementNamed(context, MaterialPageRoute(builder: (context) => LoginScreen()))
             ),
           ],
         ),
@@ -165,4 +178,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+}
+
+void _showLogoutConfirmation(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text("Konfirmasi Keluar"),
+        content: const Text("Apakah Anda yakin ingin keluar dari akun anda?"),
+        actions: [
+          TextButton(
+            child: const Text("Batal"),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: const Text("Keluar", style: TextStyle(color: Colors.red)),
+            onPressed: () {
+              // Tutup dialog
+              Navigator.pop(context);
+              // Tutup drawer
+              Navigator.pop(context);
+              // Navigasi ke login screen tanpa bisa kembali
+              Navigator.pushReplacementNamed(context, LoginScreen.id);
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

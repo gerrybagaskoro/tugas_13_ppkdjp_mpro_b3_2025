@@ -2,7 +2,7 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
+import 'package:tugas_13_laporan_keuangan_harian/extensions/navigations.dart';
 import 'package:tugas_13_laporan_keuangan_harian/preference/shared_preference.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/dashboard_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/register_screen.dart';
@@ -17,55 +17,42 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  String? hintText;
+  bool isLoading = false;
+  bool isPassword = false;
   bool rememberMe = false;
+  bool isVisibility = false;
+
   final _formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  @override
-  void initState() {
-    super.initState();
-    // Initialize any controllers or variables here if needed
-  }
-
-  @override
-  void dispose() {
-    emailController.dispose();
-    // Dispose of any controllers or resources here if needed
-    super.dispose();
-  }
-
-  Future<void> login() async {
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
-
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Email dan Password tidak boleh kosong")),
-      );
-      return;
-    }
-
-    final userData = await DbHelper.loginUser(email, password);
-    if (userData != null) {
-      PreferenceHandler.saveLogin();
-      Navigator.pushReplacementNamed(
-        context,
-        DashboardScreen.id,
-        arguments: userData,
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Email atau Password salah")),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    login() async {
+      final email = emailController.text.trim();
+      final password = passwordController.text.trim();
+      if (email.isEmpty || password.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Email dan Password tidak boleh kosong"),
+          ),
+        );
+        return;
+      }
+
+      final userData = await DbHelper.loginUser(email, password);
+      if (userData != null) {
+        PreferenceHandler.saveLogin();
+        context.pushReplacementNamed(DashboardScreen.id);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Email atau Password salah")),
+        );
+      }
+    }
+
     return Scaffold(
-      // appBar: AppBar(
-      //   // title: Text("Login", style: TextStyle(color: Colors.black)),
-      // ),
       body: Padding(
         padding: const EdgeInsets.all(32),
         child: SingleChildScrollView(
@@ -147,12 +134,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: 16),
                     TextFormField(
                       controller: passwordController,
+                      obscureText: isPassword ? isVisibility : false,
                       style: TextStyle(color: const Color(0xFF1D1B20)),
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(
-                          Icons.lock,
-                          color: Color(0xFF1D1B20),
-                        ),
+                        prefixIcon: const Icon(Icons.lock, color: Colors.black),
                         labelText: 'Password',
                         hintText: "Masukkan Password anda",
                         hintStyle: TextStyle(
@@ -162,7 +147,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         labelStyle: TextStyle(color: const Color(0xFF1D1B20)),
                         filled: true,
                         fillColor: const Color(0xFFE6E0E9),
-                        // border: InputBorder.none,
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
                             color: const Color(0xFF49454F),
@@ -173,12 +157,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           vertical: 8.0,
                           horizontal: 8.0,
                         ),
-                        // focusedBorder: const OutlineInputBorder(
-                        //   borderSide: BorderSide(
-                        //     color: Color(0xFF4F378A),
-                        //     width: 2,
-                        //   ),
-                        // ),
                       ),
                       keyboardType: TextInputType.visiblePassword,
                       validator: (value) {
@@ -218,59 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: 8),
                     ElevatedButton(
                       onPressed: () {
-                        //Error dan sukses menggunakan ScaffoldMessenger dan formKey
-                        if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Login Berhasil!"),
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                          Future.delayed(const Duration(seconds: 3), () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const DashboardScreen(),
-                              ),
-                            );
-                          });
-                        } else {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text("Peringatan"),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text("Login Gagal"),
-                                    SizedBox(height: 20),
-                                    Lottie.asset(
-                                      'assets/images/animations/error.json',
-                                      width: 200,
-                                      height: 200,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ],
-                                ),
-                                actions: [
-                                  TextButton(
-                                    child: Text("Batal"),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: Text("Lanjutkan"),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        }
+                        login();
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(360, 48),
@@ -405,12 +331,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const RegisterScreen(),
-                                ),
-                              );
+                              context.push(RegisterScreen());
                             },
                         ),
                       ],

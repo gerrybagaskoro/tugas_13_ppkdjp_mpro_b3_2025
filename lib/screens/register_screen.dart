@@ -2,9 +2,7 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
-import 'package:tugas_13_laporan_keuangan_harian/preference/shared_preference.dart';
-import 'package:tugas_13_laporan_keuangan_harian/screens/dashboard_screen.dart';
+import 'package:tugas_13_laporan_keuangan_harian/models/users.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/login_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/sqflite/db_helper.dart';
 
@@ -17,51 +15,45 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  bool rememberMe = false;
+  bool rememberMe = false; //Unused Boolean
+  bool isVisibility = false;
+  bool isLoading = false;
+  bool isPassword = false;
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   @override
-  void initState() {
-    super.initState();
-    // Initialize any controllers or variables here if needed
-  }
-
-  @override
-  void dispose() {
-    emailController.dispose();
-    // Dispose of any controllers or resources here if needed
-    super.dispose();
-  }
-
-  Future<void> login() async {
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
-
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Email dan Password tidak boleh kosong")),
-      );
-      return;
-    }
-
-    final userData = await DbHelper.loginUser(email, password);
-    if (userData != null) {
-      PreferenceHandler.saveLogin();
-      Navigator.pushReplacementNamed(
-        context,
-        DashboardScreen.id,
-        arguments: userData,
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Email atau Password salah")),
-      );
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    void registerUser() async {
+      setState(() => isLoading = true);
+
+      final name = nameController.text.trim();
+      final email = emailController.text.trim();
+      final password = passwordController.text.trim();
+
+      if (email.isEmpty || password.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Email, Password, dan Nama tidak boleh kosong"),
+          ),
+        );
+        isLoading = false;
+
+        return;
+      }
+      final user = User(email: email, password: password, name: name);
+      await DbHelper.registerUser(user);
+      Future.delayed(const Duration(seconds: 1)).then((value) {
+        isLoading = false;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Pendaftaran berhasil")));
+      });
+      setState(() {});
+      isLoading = false;
+    }
+
     return Scaffold(
       // appBar: AppBar(
       //   // title: Text("Login", style: TextStyle(color: Colors.black)),
@@ -83,7 +75,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 12),
               Text(
                 'Silahkan daftar akun terlebih dahulu',
                 style: TextStyle(
@@ -99,6 +91,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   children: [
                     TextFormField(
+                      controller: nameController,
+                      style: TextStyle(color: Colors.black),
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(
+                          Icons.person,
+                          color: Colors.black,
+                        ),
+                        labelText: 'Nama',
+                        hintText: "Masukkan Nama Lengkap anda",
+                        hintStyle: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 16,
+                        ),
+                        labelStyle: TextStyle(color: const Color(0xFF1D1B20)),
+                        filled: true,
+                        fillColor: const Color(0xFFE6E0E9),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: const Color(0xFF49454F),
+                            width: 2,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 8.0,
+                          horizontal: 8.0,
+                        ),
+                      ),
+                      keyboardType: TextInputType.name,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Nama tidak boleh kosong";
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 12),
+                    TextFormField(
                       controller: emailController,
                       style: TextStyle(color: Colors.black),
                       decoration: InputDecoration(
@@ -108,14 +137,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         labelText: 'Email',
                         hintText: "Masukkan Email anda",
-                        labelStyle: TextStyle(color: Colors.black),
-                        focusedBorder: const OutlineInputBorder(
+                        hintStyle: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 16,
+                        ),
+                        labelStyle: TextStyle(color: const Color(0xFF1D1B20)),
+                        filled: true,
+                        fillColor: const Color(0xFFE6E0E9),
+                        enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
-                            color: Color(0xFF4F378A),
+                            color: const Color(0xFF49454F),
                             width: 2,
                           ),
                         ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 8.0,
+                          horizontal: 8.0,
+                        ),
                       ),
+                      keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Email tidak boleh kosong";
@@ -135,22 +175,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       //   }
                       // },
                     ),
-                    SizedBox(height: 8),
+                    SizedBox(height: 12),
                     TextFormField(
                       controller: passwordController,
-                      style: TextStyle(color: Colors.black),
+                      obscureText: isPassword ? isVisibility : false,
+                      style: TextStyle(color: const Color(0xFF1D1B20)),
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.lock, color: Colors.black),
                         labelText: 'Password',
                         hintText: "Masukkan Password anda",
-                        // labelStyle: TextStyle(color: Colors.black),
-                        focusedBorder: const OutlineInputBorder(
+                        hintStyle: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 16,
+                        ),
+                        labelStyle: TextStyle(color: const Color(0xFF1D1B20)),
+                        filled: true,
+                        fillColor: const Color(0xFFE6E0E9),
+                        enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
-                            color: Color(0xFF4F378A),
+                            color: const Color(0xFF49454F),
                             width: 2,
                           ),
                         ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 8.0,
+                          horizontal: 8.0,
+                        ),
                       ),
+                      keyboardType: TextInputType.visiblePassword,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Password tidak boleh kosong";
@@ -161,98 +213,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
-                    // Row(
-                    //   crossAxisAlignment: CrossAxisAlignment.center,
-                    //   children: [
-                    //     Checkbox(
-                    //       activeColor: const Color(0xFF6750A4),
-                    //       value: rememberMe,
-                    //       onChanged: (value) {
-                    //         setState(() {
-                    //           rememberMe = value!;
-                    //         });
-                    //       },
-                    //     ),
-                    //     Expanded(
-                    //       child: Text(
-                    //         rememberMe ? "Ingat Saya" : "Ingat Saya",
-                    //         style: TextStyle(
-                    //           color: rememberMe ? Colors.black : Colors.black,
-                    //           // fontWeight: FontWeight.w500,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
                     SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: () {
-                        //Error dan sukses menggunakan ScaffoldMessenger dan formKey
-                        if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Login Berhasil!"),
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                          Future.delayed(const Duration(seconds: 3), () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const DashboardScreen(),
-                              ),
-                            );
-                          });
-                        } else {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text("Peringatan"),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text("Login Gagal"),
-                                    SizedBox(height: 20),
-                                    Lottie.asset(
-                                      'assets/images/animations/error.json',
-                                      width: 200,
-                                      height: 200,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ],
-                                ),
-                                actions: [
-                                  TextButton(
-                                    child: Text("Batal"),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: Text("Lanjutkan"),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        }
+                        registerUser();
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(360, 48),
                         backgroundColor: const Color(0xFFEADDFF),
                       ),
-                      child: Text(
-                        "Daftar",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF4F378A),
-                        ),
-                      ),
+                      child: isLoading
+                          ? CircularProgressIndicator()
+                          : Text(
+                              "Daftar",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4F378A),
+                              ),
+                            ),
                     ),
                   ],
                 ),
