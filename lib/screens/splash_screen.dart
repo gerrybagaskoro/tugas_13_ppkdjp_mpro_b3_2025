@@ -43,12 +43,20 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(AppImage.iconDashboard),
-            // SizedBox(height: 8),
-            // Text(
-            //   "Money Tracker",
-            //   style: TextStyle(fontWeight: FontWeight.bold),
-            // ),
+            SizedBox(
+              width: 200,
+              height: 200,
+              child: Image.asset(AppImage.iconDashboard, fit: BoxFit.contain),
+            ),
+            const SizedBox(height: 16), // Jarak tambahan
+            const Text(
+              "Money Tracker",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
           ],
         ),
       ),
