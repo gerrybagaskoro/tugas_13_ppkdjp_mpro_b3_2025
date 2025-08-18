@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:tugas_13_laporan_keuangan_harian/models/users.dart';
@@ -91,12 +91,17 @@ class _UserScreenState extends State<UserScreen> {
         child: Column(
           children: [
             const Text("Daftar Akun", style: TextStyle(fontSize: 16)),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             TextFormConst(hintText: "Nama", controller: nameController),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             TextFormConst(hintText: "Email", controller: emailController),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             TextFormConst(hintText: "Password", controller: passwordController),
+            const SizedBox(height: 12),
+            Text(
+              "Setelah pendaftaran berhasil akun dapat digunakan saat login",
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w400),
+            ),
             const SizedBox(height: 8),
             ElevatedButton(
               onPressed: () async {
@@ -129,7 +134,7 @@ class _UserScreenState extends State<UserScreen> {
 
                 getUser();
               },
-              child: const Text("Simpan Data"),
+              child: const Text("Daftar"),
             ),
             ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
@@ -138,6 +143,7 @@ class _UserScreenState extends State<UserScreen> {
               itemBuilder: (BuildContext context, int index) {
                 final dataUserLogin = users[index];
                 return ListTile(
+                  leading: Icon(Icons.person),
                   title: Text(dataUserLogin.name!),
                   subtitle: Text(dataUserLogin.email),
                   trailing: Row(
@@ -183,26 +189,30 @@ class TextFormConst extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      style: TextStyle(color: Colors.black87, fontSize: 16),
       onChanged: onChanged,
       decoration: InputDecoration(
         hintText: hintText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(32),
-          borderSide: BorderSide(
-            color: Colors.black.withOpacity(0.2),
-            width: 1.0,
-          ),
+        hintStyle: TextStyle(color: Colors.black87, fontSize: 16),
+        // border: OutlineInputBorder(
+        //   borderRadius: BorderRadius.circular(16),
+        //   borderSide: BorderSide(
+        //     color: const Color(0xFF1D1B20).withOpacity(0.2),
+        //     width: 2.0,
+        //   ),
+        // ),
+        // focusedBorder: OutlineInputBorder(
+        //   borderSide: const BorderSide(color: Color(0xFF1D1B20), width: 1.0),
+        // ),
+        labelStyle: TextStyle(color: const Color(0xFF1D1B20)),
+        filled: true,
+        fillColor: const Color(0xFFE6E0E9),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: const Color(0xFF49454F), width: 2),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(32),
-          borderSide: const BorderSide(color: Colors.black, width: 1.0),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(32),
-          borderSide: BorderSide(
-            color: Colors.black.withOpacity(0.2),
-            width: 1.0,
-          ),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 8.0,
+          horizontal: 8.0,
         ),
       ),
     );
