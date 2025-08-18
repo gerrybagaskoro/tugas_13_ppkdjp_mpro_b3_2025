@@ -133,21 +133,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Menu (Tambah, Edit, Rekap)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  // crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    buildActionButton(
+                    actionButton(
                       icon: Icons.add,
                       label: "Tambah",
                       color: Colors.blue,
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        '/add_transaction_screen',
+                      ),
                     ),
-                    buildActionButton(
+                    actionButton(
                       icon: Icons.edit,
                       label: "Edit",
                       color: Colors.green,
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        '/edit_transaction_screen',
+                      ),
                     ),
-                    buildActionButton(
+                    actionButton(
                       icon: Icons.balance,
                       label: "Rekap",
                       color: Colors.amber,
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        '/report_transaction_screen',
+                      ),
                     ),
                   ],
                 ),
