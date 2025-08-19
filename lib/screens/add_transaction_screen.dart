@@ -1,95 +1,153 @@
 import 'package:flutter/material.dart';
+import 'package:tugas_13_laporan_keuangan_harian/models/transaction.dart';
+// import 'package:tugas_13_laporan_keuangan_harian/models/transaksi.dart';
+import 'package:tugas_13_laporan_keuangan_harian/sqflite/db_helper.dart';
 
 class AddTransactionScreen extends StatefulWidget {
+  static const id = '/add_transaction_screen';
+
   const AddTransactionScreen({super.key});
-  static const id = "/add_transaction_screen";
 
   @override
-  State<AddTransactionScreen> createState() => _AddTransactionScreenState();
+  _AddTransactionScreenState createState() => _AddTransactionScreenState();
 }
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
-  final int _value = 1;
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController jumlahController = TextEditingController();
+  final TextEditingController kategoriController = TextEditingController();
+  final TextEditingController deskripsiController = TextEditingController();
+
+  String selectedJenis = 'Pemasukan';
+  DateTime selectedDate = DateTime.now();
+
+  List<String> kategoriPemasukan = ['Gaji', 'Bonus', 'Investasi', 'Lainnya'];
+  List<String> kategoriPengeluaran = [
+    'Makanan',
+    'Transportasi',
+    'Hiburan',
+    'Tagihan',
+    'Lainnya',
+  ];
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Tambah Transaksi Saldo")),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(16),
-                  height: 100,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8DEF8),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFE0E0E0)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Saldo terkini:",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: const Color(0xFF4F378A),
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Rp25.000.000",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF4F378A),
-                        ),
-                      ),
-                    ],
-                  ),
+      appBar: AppBar(title: Text('Tambah Transaksi')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedJenis,
+                items: ['Pemasukan', 'Pengeluaran'].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedJenis = newValue!;
+                    kategoriController.text = '';
+                  });
+                },
+                decoration: InputDecoration(labelText: 'Jenis Transaksi'),
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: jumlahController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Jumlah',
+                  prefixText: 'Rp ',
                 ),
-                SizedBox(height: 8),
-                Text("Tipe Transaksi"),
-                DropdownButton(
-                  // value: pilihDropDown,
-                  hint: Text("Pilih Opsi Transaksi"),
-                  items: ["Pendapatan", "Pengeluaran"].map((String value) {
-                    return DropdownMenuItem(value: value, child: Text(value));
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      // pilihDropDown = value!;
-                    });
-                  },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Masukkan jumlah transaksi';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Masukkan angka yang valid';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: kategoriController.text.isEmpty
+                    ? null
+                    : kategoriController.text,
+                items:
+                    (selectedJenis == 'Pemasukan'
+                            ? kategoriPemasukan
+                            : kategoriPengeluaran)
+                        .map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        })
+                        .toList(),
+                onChanged: (newValue) {
+                  kategoriController.text = newValue!;
+                },
+                decoration: InputDecoration(labelText: 'Kategori'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Pilih kategori';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: deskripsiController,
+                decoration: InputDecoration(labelText: 'Deskripsi (opsional)'),
+              ),
+              SizedBox(height: 16),
+              ListTile(
+                title: Text('Tanggal'),
+                subtitle: Text(
+                  '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
                 ),
-                ListTile(
-                  title: Text("Pemasukan"),
-                  leading: Radio(
-                    groupValue: _value,
-                    value: 1,
-                    onChanged: (value) {},
-                  ),
-                ),
-                ListTile(
-                  title: Text("Pengeluaran"),
-                  leading: Radio(
-                    groupValue: _value,
-                    value: 2,
-                    onChanged: (value) {},
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text("Masukkan Nominal"),
-                TextField(),
-                SizedBox(height: 8),
-                Text("Masukkan Deskripsi"),
-                TextField(),
-              ],
-            ),
+                trailing: Icon(Icons.calendar_today),
+                onTap: () => _selectDate(context),
+              ),
+              SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    Transaksi newTransaksi = Transaksi(
+                      jenis: selectedJenis,
+                      jumlah: double.parse(jumlahController.text),
+                      kategori: kategoriController.text,
+                      deskripsi: deskripsiController.text,
+                      tanggal: selectedDate,
+                    );
+
+                    await DbHelper.addTransaksi(newTransaksi);
+                    Navigator.pop(context);
+                  }
+                },
+                child: Text('Simpan Transaksi'),
+              ),
+            ],
           ),
         ),
       ),

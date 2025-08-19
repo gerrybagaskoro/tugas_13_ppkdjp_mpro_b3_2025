@@ -1,97 +1,129 @@
 import 'package:flutter/material.dart';
+import 'package:tugas_13_laporan_keuangan_harian/main.dart';
+import 'package:tugas_13_laporan_keuangan_harian/sqflite/db_helper.dart';
 
 class ReportTransactionScreen extends StatefulWidget {
+  static const id = '/report_transaction_screen';
+
   const ReportTransactionScreen({super.key});
-  static const id = "/report_transaction_screen";
 
   @override
-  State<ReportTransactionScreen> createState() =>
+  _ReportTransactionScreenState createState() =>
       _ReportTransactionScreenState();
 }
 
 class _ReportTransactionScreenState extends State<ReportTransactionScreen> {
-  final int _value = 1;
+  double totalPemasukan = 0;
+  double totalPengeluaran = 0;
+  double saldo = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReportData();
+  }
+
+  Future<void> _loadReportData() async {
+    final allTransaksi = await DbHelper.getAllTransaksi();
+
+    double pemasukan = 0;
+    double pengeluaran = 0;
+
+    for (var transaksi in allTransaksi) {
+      if (transaksi.jenis == 'Pemasukan') {
+        pemasukan += transaksi.jumlah;
+      } else {
+        pengeluaran += transaksi.jumlah;
+      }
+    }
+
+    setState(() {
+      totalPemasukan = pemasukan;
+      totalPengeluaran = pengeluaran;
+      saldo = pemasukan - pengeluaran;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Laporan & Filter Saldo")),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: AppBar(title: Text('Laporan Keuangan')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Text('Saldo saat ini', style: TextStyle(fontSize: 18)),
+                  Text(
+                    formatCurrency(saldo),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 16),
+            Row(
               children: [
-                Container(
-                  padding: EdgeInsets.all(16),
-                  height: 100,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8DEF8),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFE0E0E0)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Saldo terkini:",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: const Color(0xFF4F378A),
-                        ),
+                Expanded(
+                  child: Container(
+                    height: 100,
+                    color: Colors.green[50],
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Pemasukan Total',
+                            style: TextStyle(color: Colors.green),
+                          ),
+                          Text(
+                            // 'Rp${totalPemasukan.toStringAsFixed(2)}',
+                            formatCurrency(totalPemasukan),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Rp25.000.000",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF4F378A),
-                        ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    height: 100,
+                    color: Colors.red[50],
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Pengeluaran Total',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                          Text(
+                            formatCurrency(totalPengeluaran),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-                SizedBox(height: 8),
-                Text("Tipe Transaksi"),
-                DropdownButton(
-                  // value: pilihDropDown,
-                  hint: Text("Pilih Opsi Transaksi"),
-                  items: ["Pendapatan", "Pengeluaran"].map((String value) {
-                    return DropdownMenuItem(value: value, child: Text(value));
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      // pilihDropDown = value!;
-                    });
-                  },
-                ),
-                ListTile(
-                  title: Text("Pemasukan"),
-                  leading: Radio(
-                    groupValue: _value,
-                    value: 1,
-                    onChanged: (value) {},
-                  ),
-                ),
-                ListTile(
-                  title: Text("Pengeluaran"),
-                  leading: Radio(
-                    groupValue: _value,
-                    value: 2,
-                    onChanged: (value) {},
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text("Masukkan Nominal"),
-                TextField(),
-                SizedBox(height: 8),
-                Text("Masukkan Deskripsi"),
-                TextField(),
               ],
             ),
-          ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadReportData,
+              child: Text('Refresh Data'),
+            ),
+          ],
         ),
       ),
     );

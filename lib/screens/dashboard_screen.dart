@@ -1,13 +1,15 @@
+// ignore_for_file: unused_element
+
 import 'package:flutter/material.dart';
+import 'package:tugas_13_laporan_keuangan_harian/main.dart';
+import 'package:tugas_13_laporan_keuangan_harian/models/transaction.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/add_transaction_screen.dart';
-import 'package:tugas_13_laporan_keuangan_harian/screens/edit_transaction_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/login_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/profile_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/report_transaction_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/user_screen.dart';
-// import 'package:tugas_13_laporan_keuangan_harian/utils/auth_service.dart';
+import 'package:tugas_13_laporan_keuangan_harian/sqflite/db_helper.dart';
 import 'package:tugas_13_laporan_keuangan_harian/widgets/button_action.dart';
-// import 'package:tugas_13_laporan_keuangan_harian/widgets/logout_button.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -18,13 +20,31 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  List<Transaksi> transaksiList = [];
+  double totalSaldo = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final transaksi = await DbHelper.getAllTransaksi();
+    final saldo = await DbHelper.getTotalSaldo();
+
+    setState(() {
+      transaksiList = transaksi;
+      totalSaldo = saldo;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Money Tracker', style: TextStyle(fontSize: 20)),
         centerTitle: true,
-        // leading: Icon(Icons.more_vert),
         actions: [IconButton(onPressed: () {}, icon: Icon(Icons.more_vert))],
       ),
       drawer: Drawer(
@@ -81,12 +101,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ListTile(
               leading: Icon(Icons.edit),
               title: Text('Edit Saldo'),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditTransactionScreen(),
-                ),
-              ),
+              // onTap: () => Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => EditTransactionScreen(),
+              //   ),
+              // ),
               // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ReportScreen())),
             ),
             ListTile(
@@ -146,8 +166,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ),
                       SizedBox(height: 4),
+
                       Text(
-                        "Rp25.000.000",
+                        formatCurrency(totalSaldo), // Ganti yang lama
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -198,133 +219,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                 ),
-
-                // // Menu (Tambah, Edit, Rekap)
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //   // crossAxisAlignment: CrossAxisAlignment.start,
-                //   children: [
-                //     actionButton(
-                //       icon: Icons.add,
-                //       label: "Tambah",
-                //       color: Colors.blue,
-                //       onTap: () => Navigator.pushNamed(
-                //         context,
-                //         '/add_transaction_screen',
-                //       ),
-                //     ),
-                //     actionButton(
-                //       icon: Icons.edit,
-                //       label: "Edit",
-                //       color: Colors.green,
-                //       onTap: () => Navigator.pushNamed(
-                //         context,
-                //         '/edit_transaction_screen',
-                //       ),
-                //     ),
-                //     actionButton(
-                //       icon: Icons.balance,
-                //       label: "Rekap",
-                //       color: Colors.amber,
-                //       onTap: () => Navigator.pushNamed(
-                //         context,
-                //         '/report_transaction_screen',
-                //       ),
-                //     ),
-                //   ],
-                // ),
                 SizedBox(height: 12),
                 Text("Riwayat Transaksi", style: TextStyle(fontSize: 16)),
                 SizedBox(height: 12),
                 Column(
-                  children: [
-                    _incomeTransactionItem(
-                      "Pemasukkan Saldo",
-                      "Rp2.000.000",
-                      "Sabtu, 16 Agustus 2025",
-                    ),
-                    _incomeTransactionItem(
-                      "Pemasukkan Saldo",
-                      "Rp4.000.000",
-                      "Minggu, 17 Agustus 2025",
-                    ),
-                    _outcomeTransactionItem(
-                      "Pengeluaran Saldo",
-                      "Rp1.000.000",
-                      "Selasa, 19 Agustus 2025",
-                    ),
-                    _outcomeTransactionItem(
-                      "Pengeluaran",
-                      "Rp2.000.000",
-                      "Rabu, 20 Agustus 2025",
-                    ),
-                    _outcomeTransactionItem(
-                      "Pengeluaran",
-                      "Rp4.000.000",
-                      "Kamis, 22 Agustus 2025",
-                    ),
-                    // Add more items as needed
-                  ],
+                  children: transaksiList.map((transaksi) {
+                    return _buildTransactionItem(transaksi);
+                  }).toList(),
                 ),
-
-                // Container(
-                //   padding: EdgeInsets.all(16),
-                //   height: 500,
-                //   width: double.infinity,
-                //   decoration: BoxDecoration(
-                //     color: const Color(0xFFE8DEF8),
-                //     borderRadius: BorderRadius.circular(16),
-                //     border: Border.all(color: const Color(0xFFE0E0E0)),
-                //   ),
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       Text(
-                //         "Riwayat Dompet Anda:",
-                //         style: TextStyle(
-                //           fontSize: 12,
-                //           color: const Color(0xFF4F378A),
-                //         ),
-                //       ),
-                //       Divider(),
-                //       SizedBox(height: 4),
-                //       Text(
-                //         "Pemasukkan Saldo",
-                //         style: TextStyle(
-                //           fontSize: 16,
-                //           fontWeight: FontWeight.w400,
-                //           color: const Color(0xFF4F378A),
-                //         ),
-                //       ),
-                //       Text(
-                //         "Rp2.000.000",
-                //         style: TextStyle(
-                //           fontSize: 14,
-                //           fontWeight: FontWeight.w400,
-                //           color: const Color(0xFF4F378A),
-                //         ),
-                //       ),
-                //       Text(
-                //         "Sabtu, 16 Agustus 2025",
-                //         style: TextStyle(
-                //           fontSize: 12,
-                //           fontWeight: FontWeight.w400,
-                //           color: const Color(0xFF4F378A),
-                //         ),
-                //       ),
-                //       Divider(),
-                //       // ListView.builder(shrinkWrap: true,physics: NeverScrollableScrollPhysics(),)
-                //       // Text(
-                //       //   "Rp25.912.800",
-                //       //   style: TextStyle(
-                //       //     fontSize: 24,
-                //       //     fontWeight: FontWeight.bold,
-                //       //     color: const Color(0xFF4F378A),
-                //       //   ),
-                //       // ),
-                //     ],
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -394,6 +296,14 @@ Widget _incomeTransactionItem(String type, String amount, String date) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
+            formatCurrency(double.parse(amount)), // Ganti yang lama
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.green,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
             type,
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
@@ -425,6 +335,14 @@ Widget _outcomeTransactionItem(String type, String amount, String date) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
+            formatCurrency(double.parse(amount)), // Ganti yang lama
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.green,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
             type,
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
@@ -440,6 +358,29 @@ Widget _outcomeTransactionItem(String type, String amount, String date) {
           SizedBox(height: 8),
           Text(date, style: TextStyle(fontSize: 14, color: Colors.grey)),
         ],
+      ),
+    ),
+  );
+}
+
+Widget _buildTransactionItem(Transaksi transaksi) {
+  return Card(
+    margin: EdgeInsets.all(8),
+    child: ListTile(
+      title: Text(
+        transaksi.deskripsi.isNotEmpty
+            ? transaksi.deskripsi
+            : transaksi.kategori,
+      ),
+      subtitle: Text(
+        '${transaksi.tanggal.day}/${transaksi.tanggal.month}/${transaksi.tanggal.year}',
+      ),
+      trailing: Text(
+        formatCurrency(transaksi.jumlah), // Ganti yang lama
+        style: TextStyle(
+          color: transaksi.jenis == 'Pemasukan' ? Colors.green : Colors.red,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     ),
   );
