@@ -9,6 +9,7 @@ class AddTransactionScreen extends StatefulWidget {
 }
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
+  final int _value = 1;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +34,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Saldo Dompet Anda:",
+                        "Saldo terkini:",
                         style: TextStyle(
                           fontSize: 14,
                           color: const Color(0xFF4F378A),
@@ -51,9 +52,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     ],
                   ),
                 ),
+                SizedBox(height: 8),
+                Text("Tipe Transaksi"),
                 DropdownButton(
                   // value: pilihDropDown,
-                  hint: Text("Pilih Opsi"),
+                  hint: Text("Pilih Opsi Transaksi"),
                   items: ["Pendapatan", "Pengeluaran"].map((String value) {
                     return DropdownMenuItem(value: value, child: Text(value));
                   }).toList(),
@@ -63,6 +66,28 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     });
                   },
                 ),
+                ListTile(
+                  title: Text("Pemasukan"),
+                  leading: Radio(
+                    groupValue: _value,
+                    value: 1,
+                    onChanged: (value) {},
+                  ),
+                ),
+                ListTile(
+                  title: Text("Pengeluaran"),
+                  leading: Radio(
+                    groupValue: _value,
+                    value: 2,
+                    onChanged: (value) {},
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text("Masukkan Nominal"),
+                TextField(),
+                SizedBox(height: 8),
+                Text("Masukkan Deskripsi"),
+                TextField(),
               ],
             ),
           ),

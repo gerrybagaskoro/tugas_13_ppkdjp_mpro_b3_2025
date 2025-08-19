@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:tugas_13_laporan_keuangan_harian/screens/add_transaction_screen.dart';
+import 'package:tugas_13_laporan_keuangan_harian/screens/edit_transaction_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/login_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/profile_screen.dart';
+import 'package:tugas_13_laporan_keuangan_harian/screens/report_transaction_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/user_screen.dart';
 // import 'package:tugas_13_laporan_keuangan_harian/utils/auth_service.dart';
 import 'package:tugas_13_laporan_keuangan_harian/widgets/button_action.dart';
@@ -69,19 +72,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ListTile(
               leading: Icon(Icons.add),
               title: Text('Tambah Saldo'),
-              onTap: () async {},
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddTransactionScreen()),
+              ),
               // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ReportScreen())),
             ),
             ListTile(
               leading: Icon(Icons.edit),
               title: Text('Edit Saldo'),
-              onTap: () async {},
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditTransactionScreen(),
+                ),
+              ),
               // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ReportScreen())),
             ),
             ListTile(
               leading: Icon(Icons.balance_rounded),
               title: Text('Rekap & Laporan Saldo'),
-              onTap: () async {},
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ReportTransactionScreen(),
+                ),
+              ),
               // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ReportScreen())),
             ),
             Spacer(),
