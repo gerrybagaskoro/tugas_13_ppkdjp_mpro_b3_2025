@@ -4,6 +4,7 @@ import 'package:tugas_13_laporan_keuangan_harian/screens/add_transaction_screen.
 import 'package:tugas_13_laporan_keuangan_harian/screens/dashboard_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/edit_transaction_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/login_screen.dart';
+import 'package:tugas_13_laporan_keuangan_harian/screens/profile_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/register_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/report_transaction_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/splash_screen.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         LoginScreen.id: (context) => LoginScreen(),
         DashboardScreen.id: (context) => DashboardScreen(),
         RegisterScreen.id: (context) => RegisterScreen(),
+        '/profile_screen': (context) => ProfileScreen(),
         '/add_transaction_screen': (context) => AddTransactionScreen(),
         '/edit_transaction_screen': (context) => EditTransactionScreen(),
         '/report_transaction_screen': (context) => ReportTransactionScreen(),
