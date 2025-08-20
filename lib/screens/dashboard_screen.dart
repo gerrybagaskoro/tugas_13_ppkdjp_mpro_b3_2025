@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:tugas_13_laporan_keuangan_harian/main.dart';
 import 'package:tugas_13_laporan_keuangan_harian/models/transaction.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/add_transaction_screen.dart';
+import 'package:tugas_13_laporan_keuangan_harian/screens/edit_transaction_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/login_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/profile_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/report_transaction_screen.dart';
@@ -20,6 +21,51 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  void _showEditOptions(BuildContext context) {
+    if (transaksiList.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Tidak ada transaksi untuk diedit')),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Pilih Transaksi untuk Diedit'),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 300,
+            child: ListView.builder(
+              itemCount: transaksiList.length,
+              itemBuilder: (context, index) {
+                final transaksi = transaksiList[index];
+                return ListTile(
+                  title: Text(transaksi.kategori),
+                  subtitle: Text(
+                    '${formatCurrency(transaksi.jumlah)} - ${transaksi.tanggal.day}/${transaksi.tanggal.month}/${transaksi.tanggal.year}',
+                  ),
+                  trailing: Icon(Icons.edit),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EditTransactionScreen(transaksi: transaksi),
+                      ),
+                    ).then((_) => _loadData()); // Reload data setelah kembali
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   List<Transaksi> transaksiList = [];
   double totalSaldo = 0;
 
@@ -193,10 +239,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             icon: Icons.edit,
                             label: "Edit",
                             color: Colors.green,
-                            onTap: () => Navigator.pushNamed(
-                              context,
-                              '/edit_transaction_screen',
-                            ),
+                            onTap: () => _showEditOptions(context),
                           ),
                           actionButton(
                             icon: Icons.balance,

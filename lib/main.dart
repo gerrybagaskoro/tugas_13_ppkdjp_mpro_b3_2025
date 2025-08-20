@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:tugas_13_laporan_keuangan_harian/models/transaction.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/add_transaction_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/dashboard_screen.dart';
+import 'package:tugas_13_laporan_keuangan_harian/screens/edit_transaction_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/login_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/profile_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/register_screen.dart';
@@ -44,6 +46,11 @@ class MyApp extends StatelessWidget {
         '/profile_screen': (context) => ProfileScreen(),
         '/add_transaction_screen': (context) => AddTransactionScreen(),
         // '/edit_transaction_screen': (context) => EditTransactionScreen(),
+        '/edit_transaction_screen': (context) {
+          final transaksi =
+              ModalRoute.of(context)!.settings.arguments as Transaksi;
+          return EditTransactionScreen(transaksi: transaksi);
+        },
         '/report_transaction_screen': (context) => ReportTransactionScreen(),
       },
     );

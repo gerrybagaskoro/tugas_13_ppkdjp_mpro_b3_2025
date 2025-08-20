@@ -28,14 +28,9 @@ class DbHelper {
           )
         ''');
       },
-      version:
-          2, // Jika Anda mengubah skema di database yang sudah ada, naikkan versi ini
+      version: 2,
     );
   }
-
-  // =======================================================
-  // == METODE UNTUK USERS (KODE LAMA ANDA)
-  // =======================================================
 
   static Future<void> registerUser(User user) async {
     final db = await databaseHelper();
@@ -81,10 +76,6 @@ class DbHelper {
     final db = await databaseHelper();
     await db.delete('users', where: 'id = ?', whereArgs: [id]);
   }
-
-  // =======================================================
-  // == c. SEMUA METODE BARU UNTUK TRANSAKSI DITAMBAHKAN DI SINI
-  // =======================================================
 
   static Future<int> addTransaksi(Transaksi transaksi) async {
     final db = await databaseHelper();
