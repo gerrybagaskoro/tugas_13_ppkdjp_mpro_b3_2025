@@ -1,8 +1,11 @@
 // ignore_for_file: unused_element
 
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:tugas_13_laporan_keuangan_harian/main.dart';
 import 'package:tugas_13_laporan_keuangan_harian/models/transaction.dart';
+import 'package:tugas_13_laporan_keuangan_harian/preference/shared_preference.dart';
+import 'package:tugas_13_laporan_keuangan_harian/screens/about_app_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/add_transaction_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/edit_transaction_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/login_screen.dart';
@@ -107,7 +110,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.balance_rounded, size: 64, color: Colors.white),
+                  Icon(
+                    Icons.account_balance_wallet,
+                    size: 64,
+                    color: Colors.white,
+                  ),
                   SizedBox(height: 16),
                   Text(
                     "Money Tracker",
@@ -166,8 +173,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-            // Spacer(), // Spacer tidak diperlukan jika item logout diletakkan setelah Divider
-            Divider(), // Tambahkan pembatas visual
+
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.android),
+              title: Text('Tentang Aplikasi'),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AboutAppScreen()),
+              ),
+            ),
             ListTile(
               leading: Icon(Icons.exit_to_app),
               title: Text('Keluar Sesi'),
@@ -224,7 +239,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             icon: Icons.add,
                             label: "Tambah",
                             color: Colors.blue,
-                            // --- PERBAIKAN 1 DI SINI ---
                             onTap: () {
                               Navigator.pushNamed(
                                 context,
@@ -309,28 +323,73 @@ void _showLogoutConfirmation(BuildContext context) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text("Konfirmasi Keluar"),
-        content: const Text("Apakah Anda yakin ingin keluar dari akun anda?"),
-        actions: [
-          TextButton(
-            child: const Text("Batal"),
-            onPressed: () => Navigator.pop(context),
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10.0,
+                offset: Offset(0.0, 10.0),
+              ),
+            ],
           ),
-          TextButton(
-            child: const Text("Keluar", style: TextStyle(color: Colors.red)),
-            onPressed: () {
-              // Tutup dialog
-              Navigator.pop(context);
-              // Tutup drawer jika terbuka
-              if (Scaffold.of(context).isDrawerOpen) {
-                Navigator.pop(context);
-              }
-              // Navigasi ke login screen tanpa bisa kembali
-              Navigator.pushReplacementNamed(context, LoginScreen.id);
-            },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Animasi Lottie
+              SizedBox(
+                height: 200,
+                child: Lottie.asset(
+                  'assets/images/animations/logout_animation.json',
+                  fit: BoxFit.contain,
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                "Keluar Sesi",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16),
+              Text(
+                "Apakah Anda yakin ingin keluar dari akun anda?",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: Text("Batal"),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  SizedBox(width: 8),
+                  TextButton(
+                    child: Text("Keluar", style: TextStyle(color: Colors.red)),
+                    onPressed: () {
+                      // 1. Hapus data login dari shared preferences
+                      PreferenceHandler.removeLogin();
+                      // 2. Navigasi ke halaman login dan hapus riwayat halaman sebelumnya
+                      Navigator.of(
+                        context,
+                      ).pushReplacementNamed(LoginScreen.id);
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       );
     },
   );

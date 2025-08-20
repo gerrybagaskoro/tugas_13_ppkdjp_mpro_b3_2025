@@ -45,7 +45,6 @@ class MyApp extends StatelessWidget {
         RegisterScreen.id: (context) => RegisterScreen(),
         '/profile_screen': (context) => ProfileScreen(),
         '/add_transaction_screen': (context) => AddTransactionScreen(),
-        // '/edit_transaction_screen': (context) => EditTransactionScreen(),
         '/edit_transaction_screen': (context) {
           final transaksi =
               ModalRoute.of(context)!.settings.arguments as Transaksi;
