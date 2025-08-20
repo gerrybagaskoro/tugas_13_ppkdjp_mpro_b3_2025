@@ -21,6 +21,28 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  List<Transaksi> transaksiList = [];
+  double totalSaldo = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final transaksi = await DbHelper.getAllTransaksi();
+    final saldo = await DbHelper.getTotalSaldo();
+
+    // Pastikan widget masih ada sebelum memanggil setState
+    if (mounted) {
+      setState(() {
+        transaksiList = transaksi;
+        totalSaldo = saldo;
+      });
+    }
+  }
+
   void _showEditOptions(BuildContext context) {
     if (transaksiList.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -48,14 +70,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   trailing: Icon(Icons.edit),
                   onTap: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Tutup dialog
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
                             EditTransactionScreen(transaksi: transaksi),
                       ),
-                    ).then((_) => _loadData()); // Reload data setelah kembali
+                    ).then(
+                      (_) => _loadData(),
+                    ); // Muat ulang data setelah kembali
                   },
                 );
               },
@@ -64,25 +88,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
       },
     );
-  }
-
-  List<Transaksi> transaksiList = [];
-  double totalSaldo = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    final transaksi = await DbHelper.getAllTransaksi();
-    final saldo = await DbHelper.getTotalSaldo();
-
-    setState(() {
-      transaksiList = transaksi;
-      totalSaldo = saldo;
-    });
   }
 
   @override
@@ -118,8 +123,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ListTile(
               leading: Icon(Icons.person),
               title: Text('Profil'),
-              // onTap: () => _onDrawerTapped(0),
-              // onTap: () async {},
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ProfileScreen()),
@@ -128,8 +131,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ListTile(
               leading: Icon(Icons.account_box),
               title: Text('Manajemen Akun'),
-              // onTap: () => _onDrawerTapped(0),
-              // onTap: () async {},
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => UserScreen()),
@@ -138,22 +139,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ListTile(
               leading: Icon(Icons.add),
               title: Text('Tambah Saldo'),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AddTransactionScreen()),
-              ),
-              // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ReportScreen())),
+              // --- PERBAIKAN 2 DI SINI ---
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddTransactionScreen(),
+                  ),
+                ).then((_) => _loadData()); // Muat ulang data setelah kembali
+              },
             ),
             ListTile(
               leading: Icon(Icons.edit),
               title: Text('Edit Saldo'),
-              // onTap: () => Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => EditTransactionScreen(),
-              //   ),
-              // ),
-              // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ReportScreen())),
+              onTap: () {
+                _showEditOptions(context);
+              },
             ),
             ListTile(
               leading: Icon(Icons.balance_rounded),
@@ -164,9 +165,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   builder: (context) => ReportTransactionScreen(),
                 ),
               ),
-              // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ReportScreen())),
             ),
-            Spacer(),
+            // Spacer(), // Spacer tidak diperlukan jika item logout diletakkan setelah Divider
+            Divider(), // Tambahkan pembatas visual
             ListTile(
               leading: Icon(Icons.exit_to_app),
               title: Text('Keluar Sesi'),
@@ -174,11 +175,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Tampilkan dialog konfirmasi
                 _showLogoutConfirmation(context);
               },
-
-              // onTap: () => _onDrawerTapped(1),
-              // onTap: () async {},
-              // await Provider.of<AuthService>(context).logout();
-              // Navigator.pushReplacementNamed(context, MaterialPageRoute(builder: (context) => LoginScreen()))
             ),
           ],
         ),
@@ -212,9 +208,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ),
                       SizedBox(height: 4),
-
                       Text(
-                        formatCurrency(totalSaldo), // Ganti yang lama
+                        formatCurrency(totalSaldo),
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -224,16 +219,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        // crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           actionButton(
                             icon: Icons.add,
                             label: "Tambah",
                             color: Colors.blue,
-                            onTap: () => Navigator.pushNamed(
-                              context,
-                              '/add_transaction_screen',
-                            ),
+                            // --- PERBAIKAN 1 DI SINI ---
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/add_transaction_screen',
+                              ).then(
+                                (_) => _loadData(),
+                              ); // Muat ulang data setelah kembali
+                            },
                           ),
                           actionButton(
                             icon: Icons.edit,
@@ -265,21 +264,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 SizedBox(height: 12),
                 Text("Riwayat Transaksi", style: TextStyle(fontSize: 16)),
                 SizedBox(height: 12),
-                Column(
-                  children: transaksiList.map((transaksi) {
-                    return _buildTransactionItem(transaksi);
-                  }).toList(),
-                ),
+                // Tampilkan pesan jika tidak ada transaksi
+                transaksiList.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 32.0),
+                          child: Text(
+                            'Belum ada transaksi.',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        ),
+                      )
+                    : Column(
+                        children: transaksiList.map((transaksi) {
+                          return _buildTransactionItem(transaksi);
+                        }).toList(),
+                      ),
               ],
             ),
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        // currentIndex: _selectedIndex > 2 ? 0 : _selectedIndex,
-        // 0 untuk dashboard, 1 untuk about, dan 2 untuk tombol logout
-        // Kalau lagi buka drawer menu, bottomnav tetap highlight dashboard
-        // onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
@@ -316,8 +322,10 @@ void _showLogoutConfirmation(BuildContext context) {
             onPressed: () {
               // Tutup dialog
               Navigator.pop(context);
-              // Tutup drawer
-              Navigator.pop(context);
+              // Tutup drawer jika terbuka
+              if (Scaffold.of(context).isDrawerOpen) {
+                Navigator.pop(context);
+              }
               // Navigasi ke login screen tanpa bisa kembali
               Navigator.pushReplacementNamed(context, LoginScreen.id);
             },
@@ -328,103 +336,37 @@ void _showLogoutConfirmation(BuildContext context) {
   );
 }
 
-Widget _incomeTransactionItem(String type, String amount, String date) {
-  return Card(
-    margin: EdgeInsets.all(8),
-    child: Container(
-      height: 120,
-      width: double.infinity,
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            formatCurrency(double.parse(amount)), // Ganti yang lama
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.green,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            type,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8),
-          Text(
-            amount,
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.green,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(date, style: TextStyle(fontSize: 14, color: Colors.grey)),
-        ],
-      ),
-    ),
-  );
-}
-
-Widget _outcomeTransactionItem(String type, String amount, String date) {
-  return Card(
-    margin: EdgeInsets.all(8),
-    child: Container(
-      height: 120,
-      width: double.infinity,
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            formatCurrency(double.parse(amount)), // Ganti yang lama
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.green,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            type,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8),
-          Text(
-            amount,
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.red,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(date, style: TextStyle(fontSize: 14, color: Colors.grey)),
-        ],
-      ),
-    ),
-  );
-}
-
 Widget _buildTransactionItem(Transaksi transaksi) {
   return Card(
-    margin: EdgeInsets.all(8),
+    margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
     child: ListTile(
+      leading: Icon(
+        transaksi.jenis == 'Pemasukan'
+            ? Icons.arrow_downward
+            : Icons.arrow_upward,
+        color: transaksi.jenis == 'Pemasukan' ? Colors.green : Colors.red,
+      ),
       title: Text(
         transaksi.deskripsi.isNotEmpty
             ? transaksi.deskripsi
             : transaksi.kategori,
+        style: TextStyle(fontWeight: FontWeight.bold),
       ),
       subtitle: Text(
         '${transaksi.tanggal.day}/${transaksi.tanggal.month}/${transaksi.tanggal.year}',
       ),
       trailing: Text(
-        formatCurrency(transaksi.jumlah), // Ganti yang lama
+        formatCurrency(transaksi.jumlah),
         style: TextStyle(
           color: transaksi.jenis == 'Pemasukan' ? Colors.green : Colors.red,
           fontWeight: FontWeight.bold,
+          fontSize: 15,
         ),
       ),
     ),
   );
 }
+
+// Widget _incomeTransactionItem dan _outcomeTransactionItem tidak digunakan lagi
+// karena sudah digantikan oleh _buildTransactionItem yang lebih dinamis.
+// Anda bisa menghapusnya untuk membersihkan kode.
