@@ -238,8 +238,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Statistik Transaksi'),
-        backgroundColor: Color(0xFF6750A4),
-        foregroundColor: Colors.white,
+        // backgroundColor: Color(0xFF6750A4),
+        // foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(12.0), // Diperkecil

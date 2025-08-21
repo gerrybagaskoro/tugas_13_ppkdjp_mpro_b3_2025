@@ -50,9 +50,9 @@ class _ReportTransactionScreenState extends State<ReportTransactionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Laporan Keuangan'),
-        backgroundColor: Color(0xFF6750A4),
-        foregroundColor: Colors.white,
+        title: Text('Rekap Transaksi'),
+        // backgroundColor: Color(0xFF6750A4),
+        // foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
