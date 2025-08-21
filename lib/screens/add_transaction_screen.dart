@@ -1,9 +1,11 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tugas_13_laporan_keuangan_harian/models/transaction.dart';
 // import 'package:tugas_13_laporan_keuangan_harian/models/transaksi.dart';
 import 'package:tugas_13_laporan_keuangan_harian/sqflite/db_helper.dart';
+import 'package:tugas_13_laporan_keuangan_harian/utils/currency_input_formatter.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   static const id = '/add_transaction_screen';
@@ -76,15 +78,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               TextFormField(
                 controller: jumlahController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Jumlah',
-                  prefixText: 'Rp ',
-                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  CurrencyInputFormatter(),
+                ],
+                decoration: InputDecoration(labelText: 'Jumlah'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Masukkan jumlah transaksi';
                   }
-                  if (double.tryParse(value) == null) {
+
+                  // Hapus format currency untuk validasi
+                  String cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
+                  if (double.tryParse(cleanValue) == null) {
                     return 'Masukkan angka yang valid';
                   }
                   return null;
@@ -142,9 +148,15 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
+                    // Hapus format currency sebelum menyimpan
+                    String cleanValue = jumlahController.text.replaceAll(
+                      RegExp(r'[^\d]'),
+                      '',
+                    );
+
                     Transaksi newTransaksi = Transaksi(
                       jenis: selectedJenis,
-                      jumlah: double.parse(jumlahController.text),
+                      jumlah: double.parse(cleanValue),
                       kategori: kategoriController.text,
                       deskripsi: deskripsiController.text,
                       tanggal: selectedDate,

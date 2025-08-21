@@ -49,81 +49,126 @@ class _ReportTransactionScreenState extends State<ReportTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Laporan Keuangan')),
+      appBar: AppBar(
+        title: Text('Laporan Keuangan'),
+        backgroundColor: Color(0xFF6750A4),
+        foregroundColor: Colors.white,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Text('Saldo saat ini', style: TextStyle(fontSize: 18)),
-                  Text(
-                    formatCurrency(saldo),
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ],
+            // Card untuk Total Pemasukan dan Pengeluaran
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // Total Pemasukan
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total Pemasukan',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        Text(
+                          formatCurrency(totalPemasukan),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    // Total Pengeluaran
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total Pengeluaran',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        Text(
+                          formatCurrency(totalPengeluaran),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 20),
+            // Divider dengan teks Saldo Akhir
             Row(
               children: [
-                Expanded(
-                  child: Container(
-                    height: 100,
-                    color: Colors.green[50],
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Pemasukan Total',
-                            style: TextStyle(color: Colors.green),
-                          ),
-                          Text(
-                            // 'Rp${totalPemasukan.toStringAsFixed(2)}',
-                            formatCurrency(totalPemasukan),
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                Expanded(child: Divider(thickness: 1, color: Colors.grey[400])),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    'Saldo Akhir',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                Expanded(
-                  child: Container(
-                    height: 100,
-                    color: Colors.red[50],
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Pengeluaran Total',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                          Text(
-                            formatCurrency(totalPengeluaran),
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                Expanded(child: Divider(thickness: 1, color: Colors.grey[400])),
               ],
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 20),
+            // Card untuk Saldo Akhir
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: saldo >= 0 ? Colors.green[50] : Colors.red[50],
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Center(
+                  child: Text(
+                    formatCurrency(saldo),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: saldo >= 0 ? Colors.green : Colors.red,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            // Tombol Refresh
             // ElevatedButton(
             //   onPressed: _loadReportData,
-            //   child: Text('Refresh Keuangan'),
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor: Color(0xFF6750A4),
+            //     foregroundColor: Colors.white,
+            //     shape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(12),
+            //     ),
+            //     minimumSize: Size(double.infinity, 50),
+            //   ),
+            //   child: Text('Refresh Data'),
             // ),
           ],
         ),

@@ -1,9 +1,12 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:tugas_13_laporan_keuangan_harian/models/transaction.dart';
 // import 'package:tugas_13_laporan_keuangan_harian/models/transaksi.dart';
 import 'package:tugas_13_laporan_keuangan_harian/sqflite/db_helper.dart';
+import 'package:tugas_13_laporan_keuangan_harian/utils/currency_input_formatter.dart';
 
 class EditTransactionScreen extends StatefulWidget {
   static const id = '/edit_transaction_screen';
@@ -21,8 +24,8 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
   late TextEditingController kategoriController;
   late TextEditingController deskripsiController;
 
-  late String selectedJenis;
-  late DateTime selectedDate;
+  String selectedJenis = '';
+  DateTime selectedDate = DateTime.now();
 
   List<String> kategoriPemasukan = ['Gaji', 'Bonus', 'Investasi', 'Lainnya'];
   List<String> kategoriPengeluaran = [
@@ -36,9 +39,18 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
   @override
   void initState() {
     super.initState();
+
     selectedJenis = widget.transaksi.jenis;
+    selectedDate = widget.transaksi.tanggal;
+
+    final formatter = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
+
     jumlahController = TextEditingController(
-      text: widget.transaksi.jumlah.toString(),
+      text: formatter.format(widget.transaksi.jumlah),
     );
     kategoriController = TextEditingController(text: widget.transaksi.kategori);
     deskripsiController = TextEditingController(
@@ -96,15 +108,19 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
               TextFormField(
                 controller: jumlahController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Jumlah',
-                  prefixText: 'Rp ',
-                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  CurrencyInputFormatter(),
+                ],
+                decoration: InputDecoration(labelText: 'Jumlah'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Masukkan jumlah transaksi';
                   }
-                  if (double.tryParse(value) == null) {
+
+                  // Hapus format currency untuk validasi
+                  String cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
+                  if (double.tryParse(cleanValue) == null) {
                     return 'Masukkan angka yang valid';
                   }
                   return null;
@@ -161,10 +177,16 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
+                    // Hapus format currency sebelum menyimpan
+                    String cleanValue = jumlahController.text.replaceAll(
+                      RegExp(r'[^\d]'),
+                      '',
+                    );
+
                     Transaksi updatedTransaksi = Transaksi(
                       id: widget.transaksi.id,
                       jenis: selectedJenis,
-                      jumlah: double.parse(jumlahController.text),
+                      jumlah: double.parse(cleanValue),
                       kategori: kategoriController.text,
                       deskripsi: deskripsiController.text,
                       tanggal: selectedDate,
