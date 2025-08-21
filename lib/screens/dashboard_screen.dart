@@ -1,6 +1,8 @@
 // ignore_for_file: unused_element
 
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tugas_13_laporan_keuangan_harian/main.dart';
 import 'package:tugas_13_laporan_keuangan_harian/models/transaction.dart';
@@ -31,6 +33,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _loadData();
+    initializeDateFormatting(
+      'id_ID',
+      null,
+    ); // Untuk inisialisasi format tanggal Indonesia
   }
 
   Future<void> _loadData() async {
@@ -134,7 +140,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             ListTile(
               leading: Icon(Icons.person),
-              title: Text('Profil'),
+              title: Text('Profil Saya'),
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ProfileScreen()),
@@ -319,6 +325,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: 'Keluar',
           ),
         ],
+        onTap: (index) {
+          if (index == 2) {
+            // Index 2 adalah tombol Keluar
+            _showLogoutConfirmation(context);
+          }
+        },
       ),
     );
   }
@@ -353,7 +365,7 @@ void _showLogoutConfirmation(BuildContext context) {
             children: [
               // Animasi Lottie
               SizedBox(
-                height: 200,
+                height: 120,
                 child: Lottie.asset(
                   'assets/images/animations/logout_animation.json',
                   fit: BoxFit.contain,
@@ -400,6 +412,11 @@ void _showLogoutConfirmation(BuildContext context) {
   );
 }
 
+String _formatTanggal(DateTime tanggal) {
+  final format = DateFormat('EEEE, d MMMM yyyy', 'id_ID');
+  return format.format(tanggal);
+}
+
 Widget _buildTransactionItem(Transaksi transaksi) {
   return Card(
     margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
@@ -417,7 +434,7 @@ Widget _buildTransactionItem(Transaksi transaksi) {
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       subtitle: Text(
-        '${transaksi.tanggal.day}/${transaksi.tanggal.month}/${transaksi.tanggal.year}',
+        _formatTanggal(transaksi.tanggal), // Format tanggal baru
       ),
       trailing: Text(
         formatCurrency(transaksi.jumlah),
@@ -430,7 +447,3 @@ Widget _buildTransactionItem(Transaksi transaksi) {
     ),
   );
 }
-
-// Widget _incomeTransactionItem dan _outcomeTransactionItem tidak digunakan lagi
-// karena sudah digantikan oleh _buildTransactionItem yang lebih dinamis.
-// Anda bisa menghapusnya untuk membersihkan kode.
