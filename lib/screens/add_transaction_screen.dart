@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:tugas_13_laporan_keuangan_harian/models/transaction.dart';
 // import 'package:tugas_13_laporan_keuangan_harian/models/transaksi.dart';
 import 'package:tugas_13_laporan_keuangan_harian/sqflite/db_helper.dart';
+import 'package:tugas_13_laporan_keuangan_harian/utils/category_constants.dart';
 import 'package:tugas_13_laporan_keuangan_harian/utils/currency_input_formatter.dart';
 
 class AddTransactionScreen extends StatefulWidget {
@@ -98,22 +99,25 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               ),
               SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value:
-                    kategoriController.text.isEmpty ||
-                        !(selectedJenis == 'Pemasukan'
-                                ? kategoriPemasukan
-                                : kategoriPengeluaran)
-                            .contains(kategoriController.text)
+                value: kategoriController.text.isEmpty
                     ? null
                     : kategoriController.text,
                 items:
                     (selectedJenis == 'Pemasukan'
-                            ? kategoriPemasukan
-                            : kategoriPengeluaran)
+                            ? CategoryConstants.kategoriPemasukan
+                            : CategoryConstants.kategoriPengeluaran)
                         .map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
-                            child: Text(value),
+                            child: Row(
+                              children: [
+                                Text(
+                                  CategoryConstants.getEmojiForCategory(value),
+                                ),
+                                SizedBox(width: 8),
+                                Text(value),
+                              ],
+                            ),
                           );
                         })
                         .toList(),

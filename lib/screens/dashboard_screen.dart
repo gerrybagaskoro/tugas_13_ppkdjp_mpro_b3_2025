@@ -16,6 +16,7 @@ import 'package:tugas_13_laporan_keuangan_harian/screens/report_transaction_scre
 import 'package:tugas_13_laporan_keuangan_harian/screens/statistic_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/user_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/sqflite/db_helper.dart';
+import 'package:tugas_13_laporan_keuangan_harian/utils/category_constants.dart';
 import 'package:tugas_13_laporan_keuangan_harian/widgets/button_action.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -66,7 +67,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            'Pilih transaksimu untuk di edit:',
+            'Pilih transaksi untuk di Edit',
             style: TextStyle(fontSize: 20),
           ),
           content: SizedBox(
@@ -80,6 +81,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   margin: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
                   elevation: 2,
                   child: ListTile(
+                    // TAMBAHKAN EMOJI DI SINI
+                    leading: Text(
+                      CategoryConstants.getEmojiForCategory(transaksi.kategori),
+                      style: TextStyle(fontSize: 20),
+                    ),
                     title: Text(transaksi.kategori),
                     subtitle: Text(
                       '${formatCurrency(transaksi.jumlah)} - ${transaksi.tanggal.day}/${transaksi.tanggal.month}/${transaksi.tanggal.year}',
@@ -104,6 +110,57 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     );
   }
+  // void _showEditOptions(BuildContext context) {
+  //   if (transaksiList.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Tidak ada transaksi untuk diedit')),
+  //     );
+  //     return;
+  //   }
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text(
+  //           'Pilih transaksimu untuk di edit:',
+  //           style: TextStyle(fontSize: 20),
+  //         ),
+  //         content: SizedBox(
+  //           width: double.maxFinite,
+  //           height: 300,
+  //           child: ListView.builder(
+  //             itemCount: transaksiList.length,
+  //             itemBuilder: (context, index) {
+  //               final transaksi = transaksiList[index];
+  //               return Card(
+  //                 margin: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
+  //                 elevation: 2,
+  //                 child: ListTile(
+  //                   title: Text(transaksi.kategori),
+  //                   subtitle: Text(
+  //                     '${formatCurrency(transaksi.jumlah)} - ${transaksi.tanggal.day}/${transaksi.tanggal.month}/${transaksi.tanggal.year}',
+  //                   ),
+  //                   trailing: Icon(Icons.edit),
+  //                   onTap: () {
+  //                     Navigator.pop(context);
+  //                     Navigator.push(
+  //                       context,
+  //                       MaterialPageRoute(
+  //                         builder: (context) =>
+  //                             EditTransactionScreen(transaksi: transaksi),
+  //                       ),
+  //                     ).then((_) => _loadData());
+  //                   },
+  //                 ),
+  //               );
+  //             },
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -434,11 +491,9 @@ Widget _buildTransactionItem(Transaksi transaksi) {
   return Card(
     margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
     child: ListTile(
-      leading: Icon(
-        transaksi.jenis == 'Pemasukan'
-            ? Icons.arrow_downward
-            : Icons.arrow_upward,
-        color: transaksi.jenis == 'Pemasukan' ? Colors.green : Colors.red,
+      leading: Text(
+        CategoryConstants.getEmojiForCategory(transaksi.kategori),
+        style: TextStyle(fontSize: 24),
       ),
       title: Text(
         transaksi.deskripsi.isNotEmpty
@@ -446,9 +501,7 @@ Widget _buildTransactionItem(Transaksi transaksi) {
             : transaksi.kategori,
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
-      subtitle: Text(
-        _formatTanggal(transaksi.tanggal), // Format tanggal baru
-      ),
+      subtitle: Text(_formatTanggal(transaksi.tanggal)),
       trailing: Text(
         formatCurrency(transaksi.jumlah),
         style: TextStyle(

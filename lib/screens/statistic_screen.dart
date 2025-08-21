@@ -1,7 +1,10 @@
 // statistics_screen.dart
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:tugas_13_laporan_keuangan_harian/sqflite/db_helper.dart';
+import 'package:tugas_13_laporan_keuangan_harian/utils/category_constants.dart';
 
 class StatisticsScreen extends StatefulWidget {
   static const id = '/statistics_screen';
@@ -185,20 +188,22 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             children: [
               Container(width: 12, height: 12, color: color),
               SizedBox(width: 6),
+              Text(
+                CategoryConstants.getEmojiForCategory(category),
+                style: TextStyle(fontSize: 14),
+              ),
+              SizedBox(width: 6),
               Expanded(
                 child: Text(
                   category,
-                  style: TextStyle(fontSize: 12), // Diperkecil
+                  style: TextStyle(fontSize: 12),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               SizedBox(width: 6),
               Text(
                 '${percentage.toStringAsFixed(1)}%',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ), // Diperkecil
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               ),
             ],
           ),
