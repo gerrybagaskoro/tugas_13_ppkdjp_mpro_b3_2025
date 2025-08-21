@@ -10,6 +10,7 @@ import 'package:tugas_13_laporan_keuangan_harian/screens/profile_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/register_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/report_transaction_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/splash_screen.dart';
+import 'package:tugas_13_laporan_keuangan_harian/screens/statistic_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/sqflite/db_helper.dart';
 
 String formatCurrency(double amount) {
@@ -51,6 +52,7 @@ class MyApp extends StatelessWidget {
           return EditTransactionScreen(transaksi: transaksi);
         },
         '/report_transaction_screen': (context) => ReportTransactionScreen(),
+        StatisticsScreen.id: (context) => StatisticsScreen(),
       },
     );
   }

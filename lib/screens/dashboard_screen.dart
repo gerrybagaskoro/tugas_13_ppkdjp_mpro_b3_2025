@@ -13,6 +13,7 @@ import 'package:tugas_13_laporan_keuangan_harian/screens/edit_transaction_screen
 import 'package:tugas_13_laporan_keuangan_harian/screens/login_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/profile_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/report_transaction_screen.dart';
+import 'package:tugas_13_laporan_keuangan_harian/screens/statistic_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/user_screen.dart';
 import 'package:tugas_13_laporan_keuangan_harian/sqflite/db_helper.dart';
 import 'package:tugas_13_laporan_keuangan_harian/widgets/button_action.dart';
@@ -65,7 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            'Pilih transaksi untuk di-edit',
+            'Pilih transaksimu untuk di edit:',
             style: TextStyle(fontSize: 20),
           ),
           content: SizedBox(
@@ -176,12 +177,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             ListTile(
               leading: Icon(Icons.balance_rounded),
-              title: Text('Rekap & Laporan Saldo'),
+              title: Text('Rekap Saldo'),
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ReportTransactionScreen(),
                 ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.pie_chart),
+              title: Text('Statistik'),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => StatisticsScreen()),
               ),
             ),
 
@@ -275,20 +284,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           ),
                           actionButton(
-                            icon: Icons.person,
-                            label: "Profil",
-                            color: Colors.grey,
-                            onTap: () =>
-                                Navigator.pushNamed(context, '/profile_screen'),
+                            icon: Icons.pie_chart,
+                            label: "Statistik",
+                            color: Colors.purple,
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => StatisticsScreen(),
+                              ),
+                            ),
                           ),
                         ],
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 12),
-                Text("Riwayat Transaksi", style: TextStyle(fontSize: 16)),
-                SizedBox(height: 12),
+                SizedBox(height: 8),
+                Text("Riwayat Transaksi :", style: TextStyle(fontSize: 16)),
+                SizedBox(height: 8),
                 // Tampilkan pesan jika tidak ada transaksi
                 transaksiList.isEmpty
                     ? Center(
