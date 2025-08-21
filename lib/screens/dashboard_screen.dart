@@ -67,30 +67,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            'Pilih transaksi untuk di Edit',
+            'Pilih transaksi untuk di-edit',
             style: TextStyle(fontSize: 20),
           ),
           content: SizedBox(
             width: double.maxFinite,
-            height: 300,
+            height: 400,
             child: ListView.builder(
               itemCount: transaksiList.length,
               itemBuilder: (context, index) {
                 final transaksi = transaksiList[index];
+                final isPemasukan = transaksi.jenis == 'Pemasukan';
+                final amountColor = isPemasukan ? Colors.green : Colors.red;
+
                 return Card(
                   margin: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
                   elevation: 2,
                   child: ListTile(
-                    // TAMBAHKAN EMOJI DI SINI
                     leading: Text(
                       CategoryConstants.getEmojiForCategory(transaksi.kategori),
                       style: TextStyle(fontSize: 20),
                     ),
-                    title: Text(transaksi.kategori),
-                    subtitle: Text(
-                      '${formatCurrency(transaksi.jumlah)} - ${transaksi.tanggal.day}/${transaksi.tanggal.month}/${transaksi.tanggal.year}',
+                    title: Text(transaksi.kategori), // Tetap warna default
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _formatTanggal(
+                            transaksi.tanggal,
+                          ), // Tetap warna default
+                        ),
+                        Text(
+                          formatCurrency(transaksi.jumlah),
+                          style: TextStyle(
+                            color: amountColor, // Hanya jumlah yang diwarnai
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                    trailing: Icon(Icons.edit),
+                    trailing: Icon(Icons.edit), // Tetap warna default
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
