@@ -58,7 +58,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Pilih Transaksi untuk Diedit'),
+          title: Text(
+            'Pilih transaksi untuk di-edit',
+            style: TextStyle(fontSize: 20),
+          ),
           content: SizedBox(
             width: double.maxFinite,
             height: 300,
@@ -66,24 +69,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
               itemCount: transaksiList.length,
               itemBuilder: (context, index) {
                 final transaksi = transaksiList[index];
-                return ListTile(
-                  title: Text(transaksi.kategori),
-                  subtitle: Text(
-                    '${formatCurrency(transaksi.jumlah)} - ${transaksi.tanggal.day}/${transaksi.tanggal.month}/${transaksi.tanggal.year}',
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
+                  elevation: 2,
+                  child: ListTile(
+                    title: Text(transaksi.kategori),
+                    subtitle: Text(
+                      '${formatCurrency(transaksi.jumlah)} - ${transaksi.tanggal.day}/${transaksi.tanggal.month}/${transaksi.tanggal.year}',
+                    ),
+                    trailing: Icon(Icons.edit),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              EditTransactionScreen(transaksi: transaksi),
+                        ),
+                      ).then((_) => _loadData());
+                    },
                   ),
-                  trailing: Icon(Icons.edit),
-                  onTap: () {
-                    Navigator.pop(context); // Tutup dialog
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            EditTransactionScreen(transaksi: transaksi),
-                      ),
-                    ).then(
-                      (_) => _loadData(),
-                    ); // Muat ulang data setelah kembali
-                  },
                 );
               },
             ),

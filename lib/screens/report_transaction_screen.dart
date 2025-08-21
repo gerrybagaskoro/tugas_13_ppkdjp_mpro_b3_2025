@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:tugas_13_laporan_keuangan_harian/main.dart';
 import 'package:tugas_13_laporan_keuangan_harian/sqflite/db_helper.dart';
@@ -119,10 +121,10 @@ class _ReportTransactionScreenState extends State<ReportTransactionScreen> {
               ],
             ),
             SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadReportData,
-              child: Text('Refresh Data'),
-            ),
+            // ElevatedButton(
+            //   onPressed: _loadReportData,
+            //   child: Text('Refresh Keuangan'),
+            // ),
           ],
         ),
       ),
