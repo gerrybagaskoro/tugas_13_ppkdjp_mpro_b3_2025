@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:tugas_13_laporan_keuangan_harian/models/transaction.dart';
@@ -112,7 +112,14 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
               ),
               SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: kategoriController.text,
+                value:
+                    kategoriController.text.isEmpty ||
+                        !(selectedJenis == 'Pemasukan'
+                                ? kategoriPemasukan
+                                : kategoriPengeluaran)
+                            .contains(kategoriController.text)
+                    ? null
+                    : kategoriController.text,
                 items:
                     (selectedJenis == 'Pemasukan'
                             ? kategoriPemasukan
@@ -125,6 +132,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                         })
                         .toList(),
                 onChanged: (newValue) {
+                  setState(() {});
                   kategoriController.text = newValue!;
                 },
                 decoration: InputDecoration(labelText: 'Kategori'),
@@ -138,11 +146,11 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
               SizedBox(height: 16),
               TextFormField(
                 controller: deskripsiController,
-                decoration: InputDecoration(labelText: 'Deskripsi (opsional)'),
+                decoration: InputDecoration(labelText: 'Deskripsi (Opsional)'),
               ),
               SizedBox(height: 16),
               ListTile(
-                title: Text('Tanggal'),
+                title: Text('Tanggal Transaksi'),
                 subtitle: Text(
                   '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
                 ),
@@ -166,7 +174,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                     Navigator.pop(context);
                   }
                 },
-                child: Text('Update Transaksi'),
+                child: Text('Perbarui Transaksi'),
               ),
               SizedBox(height: 16),
               ElevatedButton(

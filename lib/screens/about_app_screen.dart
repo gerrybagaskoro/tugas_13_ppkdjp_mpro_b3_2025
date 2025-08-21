@@ -37,7 +37,7 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
 
             // Nama Aplikasi
             const Text(
-              'Money Tracer',
+              'Money Tracker',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -111,7 +111,7 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
             Container(
               margin: const EdgeInsets.only(top: 30),
               child: const Text(
-                '© 2025 Money Tracer. All rights reserved.',
+                '© 2025 Money Tracker. All rights reserved.',
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ),

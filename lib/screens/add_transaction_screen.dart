@@ -92,7 +92,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               ),
               SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: kategoriController.text.isEmpty
+                value:
+                    kategoriController.text.isEmpty ||
+                        !(selectedJenis == 'Pemasukan'
+                                ? kategoriPemasukan
+                                : kategoriPengeluaran)
+                            .contains(kategoriController.text)
                     ? null
                     : kategoriController.text,
                 items:
@@ -107,7 +112,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         })
                         .toList(),
                 onChanged: (newValue) {
-                  kategoriController.text = newValue!;
+                  setState(() {
+                    kategoriController.text = newValue!;
+                  });
                 },
                 decoration: InputDecoration(labelText: 'Kategori'),
                 validator: (value) {

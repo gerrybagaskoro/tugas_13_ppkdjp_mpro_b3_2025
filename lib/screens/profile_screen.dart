@@ -24,7 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: const Color(0xFFE8DEF8), // Warna bingkai
-                  width: 5.0, // Tebal bingkai
+                  width: 7.5, // Tebal bingkai
                 ),
               ),
               child: CircleAvatar(
