@@ -141,7 +141,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               ),
               SizedBox(height: 16),
               ListTile(
-                title: Text('Tanggal'),
+                title: Text('Tanggal Transaksi'),
                 subtitle: Text(
                   '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
                 ),
