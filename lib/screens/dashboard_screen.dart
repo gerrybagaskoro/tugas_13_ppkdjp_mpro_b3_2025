@@ -483,9 +483,10 @@ void _showLogoutConfirmation(BuildContext context) {
                       // 1. Hapus data login dari shared preferences
                       PreferenceHandler.removeLogin();
                       // 2. Navigasi ke halaman login dan hapus riwayat halaman sebelumnya
-                      Navigator.of(
-                        context,
-                      ).pushReplacementNamed(LoginScreen.id);
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        LoginScreen.id,
+                        (Route<dynamic> route) => false,
+                      );
                     },
                   ),
                 ],
