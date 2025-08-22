@@ -74,6 +74,46 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
     }
   }
 
+  // Function to show delete confirmation dialog
+  Future<void> _showDeleteConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap a button to close
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Hapus'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Apakah Anda yakin ingin menghapus transaksi ini?'),
+                Text('Tindakan ini tidak dapat dibatalkan.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Batal'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+              onPressed: () async {
+                // Close the dialog first
+                Navigator.of(context).pop();
+                // Then delete the transaction
+                await DbHelper.deleteTransaksi(widget.transaksi.id!);
+                // Navigate back to previous screen
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -205,10 +245,8 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () async {
-                  await DbHelper.deleteTransaksi(widget.transaksi.id!);
-                  Navigator.pop(context);
-                },
+                onPressed:
+                    _showDeleteConfirmationDialog, // Changed to use the confirmation dialog
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 child: Text(
                   'Hapus Transaksi',
