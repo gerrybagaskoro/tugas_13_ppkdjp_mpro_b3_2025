@@ -2,6 +2,7 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:tugas_13_laporan_keuangan_harian/extensions/navigations.dart';
 import 'package:tugas_13_laporan_keuangan_harian/preference/shared_preference.dart';
 import 'package:tugas_13_laporan_keuangan_harian/screens/dashboard_screen.dart';
@@ -60,8 +61,13 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(padding: const EdgeInsets.all(8)),
-              SizedBox(height: 92),
-              // Center(),
+              const SizedBox(height: 16),
+              Lottie.asset(
+                'assets/images/animations/wallet_animation.json',
+                height: 240,
+                width: 240,
+                fit: BoxFit.contain,
+              ),
               Text(
                 'Selamat Datang',
                 style: TextStyle(
@@ -70,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 64),
+              SizedBox(height: 24),
               Form(
                 key: _formKey,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
